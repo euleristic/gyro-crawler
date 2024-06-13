@@ -42,6 +42,21 @@ namespace Interface {
 		VertexArray() = default;
 
 		// Attributes... should be the layout of the vertex element type
+		/*template <AttributeType...Attributes>
+		static VertexArray WithLayout(std::span<VertexBuffer> vertexBuffer) {
+			VertexArray vertexArray;
+			vertexArray.handle = vertexArray.GenerateHandle();
+			constexpr auto effectiveSizes = EffectiveSizes<0z, Attributes...>();
+			constexpr auto stride = std::reduce(effectiveSizes.cbegin(), effectiveSizes.cend(), 0u);
+
+			const auto vertexArrayBoundToken = vertexArray.Bind();
+			const auto bufferBoundToken = vertexBuffer.Bind();
+
+			vertexArray.AddAttributeRecurse<effectiveSizes.size(), Attributes...>(stride, effectiveSizes);
+			
+			return vertexArray;
+		}*/
+
 		template <AttributeType...Attributes>
 		static VertexArray WithLayout(VertexBuffer& vertexBuffer) {
 			VertexArray vertexArray;

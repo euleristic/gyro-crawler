@@ -1,15 +1,16 @@
 #include "stars.hpp"
 
 #include "shader-source.hpp"
+#include <array>
 
 using namespace Interface;
 
-constexpr glm::vec2 vertices[] = {
+constexpr auto vertices = std::to_array<const glm::vec2>({
 	{  1.0f, -1.0f },
 	{  1.0f,  1.0f },
 	{ -1.0f, -1.0f },
 	{ -1.0f,  1.0f }
-};
+});
 
 Stars::Stars(Input& input) : 
 	input(input),
@@ -22,7 +23,7 @@ Stars::Stars(Input& input) :
 	apparentPixelToClipSpaceUniform(program, "apparentPixelToClipSpaceUniform"),
 	apparentPixelsPerGameUnitUniform(program, "apparentPixelsPerGameUnitUniform"),
 	apparentPixelWidthUniform(program, "apparentPixelWidthUniform"),
-	vertexBuffer(VertexBuffer(vertices, sizeof(vertices))),
+	vertexBuffer(VertexBuffer(std::span(vertices))),
 	vertexArray(VertexArray::WithLayout<glm::vec2>(vertexBuffer)) {
 
 	static_cast<void>(transformUniform.Set(transform));
@@ -63,5 +64,5 @@ void Stars::Draw(const glm::mat3 apparentPixelToClipSpace, const float apparentP
 	boundToken = apparentPixelToClipSpaceUniform.Set(apparentPixelToClipSpace, std::move(boundToken));
 	boundToken = apparentPixelsPerGameUnitUniform.Set(apparentPixelsPerGameUnit, std::move(boundToken));
 	boundToken = apparentPixelWidthUniform.Set(apparentPixelWidth, std::move(boundToken));
-	static_cast<void>(program.Run<Program::DrawingMode::POINTS>(vertexArray, 0, sizeof(vertices) / sizeof(decltype(*vertices)), std::move(boundToken)));
+	static_cast<void>(program.Run<Program::DrawingMode::POINTS>(vertexArray, 0, vertices.size(), std::move(boundToken)));
 }

@@ -30,17 +30,17 @@ namespace Interface {
 		glBindVertexBuffers(0, buffers.size(), buffers.front(),);
 	}*/
 
-	VertexBuffer::VertexBuffer(const void* data, const size_t size) :
-		handle(HandleType([]() {
+	void VertexBuffer::Init(const size_t size, const void* data) {
+		handle = HandleType([]() {
 			GLuint key;
 			glGenBuffers(1, &key);
 			return key;
 		}(), [](const GLuint key) {
 			glDeleteBuffers(1, &key);
-		})) {
-			auto token = Bind();
-			glBufferData(GL_ARRAY_BUFFER, size, data, GL_STATIC_DRAW);
-		}
+		});
+		auto token = Bind();
+		glBufferData(GL_ARRAY_BUFFER, size, data, GL_STATIC_DRAW);
+	}
 
 	GLuint VertexBuffer::Key() const {
 		return *handle;

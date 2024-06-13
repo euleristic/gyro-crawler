@@ -8,6 +8,7 @@
 namespace Interface {
 	class VertexBuffer {
 		using HandleType = euleristic::UniqueKey<uint32_t, 0u, false>;
+		void Init(const size_t size, const void* data);
 	public:
 		class BoundToken {
 			friend VertexBuffer;
@@ -17,7 +18,10 @@ namespace Interface {
 			BindType bound;
 		};
 		VertexBuffer() = default;
-		VertexBuffer(const void* data, const size_t size);
+		template <typename Vertex, size_t size>
+		VertexBuffer(const std::span<Vertex, size> buffer) {
+			Init(buffer.size() * sizeof(Vertex), buffer.data());
+		};
 		unsigned int Key() const;
 		BoundToken Bind();
 		// static BoundToken Bind(const std::span<VertexBuffer> buffers);
