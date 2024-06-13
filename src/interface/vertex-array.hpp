@@ -16,7 +16,7 @@ namespace Interface {
 		using HandleType = euleristic::UniqueKey<uint32_t, 0u, false>;
 
 		template <AttributeType Attribute>
-		void AddAttribute(const uint32_t index, const int32_t stride, const void* pointer);
+		void AddAttribute(const uint32_t index, const uint32_t relativeOffset);
 
 		HandleType GenerateHandle();
 		// Parameter pack helpers
@@ -27,9 +27,9 @@ namespace Interface {
 			EffectiveSizes(const std::array<size_t, arraySize>& precedingSizes = std::array<size_t, 0>{}, const size_t precedingAlignment = 1z);
 
 		template <size_t arraySize, typename RemainingMemberType>
-		void AddAttributeRecurse(const size_t stride, const std::array<size_t, arraySize>& sizes, const size_t offset = 0z);
+		void AddAttributeRecurse(const std::array<size_t, arraySize>& sizes, const uint32_t relativeOffset = 0u);
 		template <size_t arraySize, typename NextMemberType, typename...RemainingMemberTypes> requires (sizeof...(RemainingMemberTypes) > 0)
-		void AddAttributeRecurse(const size_t stride, const std::array<size_t, arraySize>& sizes, const size_t offset = 0z);
+		void AddAttributeRecurse(const std::array<size_t, arraySize>& sizes, const uint32_t relativeOffset = 0u);
 		template <typename Head, typename...Tail> struct FirstOf { using Type = Head; };
 	public:
 		class BoundToken {
@@ -41,33 +41,15 @@ namespace Interface {
 		
 		VertexArray() = default;
 
-		// Attributes... should be the layout of the vertex element type
-		/*template <AttributeType...Attributes>
-		static VertexArray WithLayout(std::span<VertexBuffer> vertexBuffer) {
-			VertexArray vertexArray;
-			vertexArray.handle = vertexArray.GenerateHandle();
-			constexpr auto effectiveSizes = EffectiveSizes<0z, Attributes...>();
-			constexpr auto stride = std::reduce(effectiveSizes.cbegin(), effectiveSizes.cend(), 0u);
-
-			const auto vertexArrayBoundToken = vertexArray.Bind();
-			const auto bufferBoundToken = vertexBuffer.Bind();
-
-			vertexArray.AddAttributeRecurse<effectiveSizes.size(), Attributes...>(stride, effectiveSizes);
-			
-			return vertexArray;
-		}*/
-
 		template <AttributeType...Attributes>
-		static VertexArray WithLayout(VertexBuffer& vertexBuffer) {
+		static VertexArray WithLayout() {
 			VertexArray vertexArray;
 			vertexArray.handle = vertexArray.GenerateHandle();
 			constexpr auto effectiveSizes = EffectiveSizes<0z, Attributes...>();
-			constexpr auto stride = std::reduce(effectiveSizes.cbegin(), effectiveSizes.cend(), 0u);
 
 			const auto vertexArrayBoundToken = vertexArray.Bind();
-			const auto bufferBoundToken = vertexBuffer.Bind();
 
-			vertexArray.AddAttributeRecurse<effectiveSizes.size(), Attributes...>(stride, effectiveSizes);
+			vertexArray.AddAttributeRecurse<effectiveSizes.size(), Attributes...>(effectiveSizes);
 			
 			return vertexArray;
 		}
@@ -109,15 +91,15 @@ namespace Interface {
 	}
 
 	template <size_t arraySize, typename RemainingMemberType>
-	void VertexArray::AddAttributeRecurse(const size_t stride, [[maybe_unused]] const std::array<size_t, arraySize>& sizes, const size_t offset) {
-		AddAttribute<RemainingMemberType>(arraySize - 1, stride, reinterpret_cast<void*>(offset));
+	void VertexArray::AddAttributeRecurse([[maybe_unused]] const std::array<size_t, arraySize>& sizes, const uint32_t relativeOffset) {
+		AddAttribute<RemainingMemberType>(arraySize - 1, relativeOffset);
 	}
 
 	template <size_t arraySize, typename NextMemberType, typename...RemainingMemberTypes> requires (sizeof...(RemainingMemberTypes) > 0)
-	void VertexArray::AddAttributeRecurse(const size_t stride, const std::array<size_t, arraySize>& sizes, const size_t offset) {
+	void VertexArray::AddAttributeRecurse(const std::array<size_t, arraySize>& sizes, const uint32_t relativeOffset) {
 		constexpr auto index = arraySize - 1 - sizeof...(RemainingMemberTypes);
-		AddAttribute<NextMemberType>(index, stride, reinterpret_cast<void*>(offset));
-		AddAttributeRecurse<arraySize, RemainingMemberTypes...>(stride, sizes, offset + sizes[index]);
+		AddAttribute<NextMemberType>(index, relativeOffset);
+		AddAttributeRecurse<arraySize, RemainingMemberTypes...>(sizes, relativeOffset + sizes[index]);
 	}
 }
 #endif // !VERTEX_ARRAY_HPP

@@ -12,21 +12,23 @@ namespace Interface {
 	public:
 		class BoundToken {
 			friend VertexBuffer;
-			BoundToken(const uint32_t key);
-			BoundToken(const std::span<VertexBuffer> buffers);
+			BoundToken(const uint32_t key, const ptrdiff_t offset, const int32_t stride);
 			using BindType = euleristic::UniqueKey<bool, false, false>;
 			BindType bound;
 		};
 		VertexBuffer() = default;
 		template <typename Vertex, size_t size>
-		VertexBuffer(const std::span<Vertex, size> buffer) {
+		VertexBuffer(const std::span<Vertex, size> buffer) : size(size), elemSize(sizeof(Vertex)) {
 			Init(buffer.size() * sizeof(Vertex), buffer.data());
 		};
-		unsigned int Key() const;
+		uint32_t Key() const;
+		size_t Size() const;
+		size_t ElementSize() const;
 		BoundToken Bind();
-		// static BoundToken Bind(const std::span<VertexBuffer> buffers);
 	private:
 		HandleType handle;
+		size_t size;
+		size_t elemSize;
 	};
 }
 #endif // !VERTEX_BUFFER_HPP

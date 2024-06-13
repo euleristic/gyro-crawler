@@ -10,7 +10,6 @@ public:
 	void Update(const float deltaTime);
 	void Draw(const glm::mat3 apparentPixelToClipSpace, const float apparentPixelsPerGameUnit, const float apparentPixelWidth);
 private:
-	// std::array<std::vector<glm::vec2>> vertices;
 	Interface::Input& input;
 	Interface::Program program;
 	glm::mat3 transform;

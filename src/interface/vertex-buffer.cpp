@@ -4,31 +4,18 @@
 
 namespace Interface {
 
-	VertexBuffer::BoundToken::BoundToken(const GLuint key) : bound(BindType(true,
+	VertexBuffer::BoundToken::BoundToken(const GLuint key, const GLintptr offset, const GLsizei stride) : bound(BindType(true,
 #		ifndef NDEBUG
 			[](const bool bound) {
 				if (bound)
-					glBindBuffer(GL_ARRAY_BUFFER, 0u);
+					glBindVertexBuffer(0, 0, 0, 0);
 			}
 #		else // NDEBUG
 			euleristic::NoOp<GLuint>
 #		endif // NDEBUG
 		)) {
-		glBindBuffer(GL_ARRAY_BUFFER, key);
+		glBindVertexBuffer(0, key, offset, stride);
 	}
-
-	/*VertexBuffer::BoundToken::BoundToken(const std::span<VertexBuffer> buffers) : bound(BindType(true,
-#		ifndef NDEBUG
-			[](const bool bound) {
-				if (bound)
-					glBindBuffer(GL_ARRAY_BUFFER, 0u);
-			}
-#		else // NDEBUG
-			euleristic::NoOp<GLuint>
-#		endif // NDEBUG
-		)) {
-		glBindVertexBuffers(0, buffers.size(), buffers.front(),);
-	}*/
 
 	void VertexBuffer::Init(const size_t size, const void* data) {
 		handle = HandleType([]() {
@@ -38,20 +25,25 @@ namespace Interface {
 		}(), [](const GLuint key) {
 			glDeleteBuffers(1, &key);
 		});
-		auto token = Bind();
+		// auto token = Bind();
+		glBindBuffer(GL_ARRAY_BUFFER, Key());
 		glBufferData(GL_ARRAY_BUFFER, size, data, GL_STATIC_DRAW);
+		glBindBuffer(GL_ARRAY_BUFFER, 0u);
 	}
 
 	GLuint VertexBuffer::Key() const {
 		return *handle;
 	}
 
-	VertexBuffer::BoundToken VertexBuffer::Bind() {
-		return BoundToken(Key());
+	size_t VertexBuffer::Size() const {
+		return size;
 	}
 
-	/*VertexBuffer::BoundToken VertexBuffer::Bind(std::span<VertexBuffer> buffers) {
-		//if (buffers.empty()) throw std::runtime_error("Attempt to bind
-	
-	}*/
+	size_t VertexBuffer::ElementSize() const {
+		return elemSize;
+	}
+
+	VertexBuffer::BoundToken VertexBuffer::Bind() {
+		return BoundToken(Key(), 0, ElementSize());
+	}
 }

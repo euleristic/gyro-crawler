@@ -57,24 +57,26 @@ namespace Interface {
 	}
 
 	template <AttributeScalarType T>
-	void AddScalarAttribute(const GLuint index, const GLsizei stride, const void* pointer) {
-		glVertexAttribPointer(index, 1, Symbol<T>(), GL_FALSE, stride, pointer);
+	void AddScalarAttribute(const GLuint index, const GLuint relativeOffset) {
 		glEnableVertexAttribArray(index);
+		glVertexAttribFormat(index, 1, Symbol<T>(), GL_FALSE, relativeOffset);
+		glVertexAttribBinding(index, 0);
 	}
 
 	template <AttributeType T> requires (!AttributeScalarType<T>)
-	void AddVectorAttribute(const GLuint index, const GLsizei stride, const void* pointer) {
-		glVertexAttribPointer(index, T::length(), Symbol<typename T::value_type>(), GL_FALSE, stride, pointer);
+	void AddVectorAttribute(const GLuint index, const GLuint relativeOffset) {
 		glEnableVertexAttribArray(index);
+		glVertexAttribFormat(index, T::length(), Symbol<typename T::value_type>(), GL_FALSE, relativeOffset);
+		glVertexAttribBinding(index, 0);
 	}
 
 	template <AttributeType T>
-	void VertexArray::AddAttribute(const GLuint index, const GLsizei stride, const void* pointer) {
+	void VertexArray::AddAttribute(const GLuint index, const GLuint relativeOffset) {
 		if constexpr (AttributeScalarType<T>) {
-			AddScalarAttribute<T>(index, stride, pointer);
+			AddScalarAttribute<T>(index, relativeOffset);
 		}
 		else {
-			AddVectorAttribute<T>(index, stride, pointer);
+			AddVectorAttribute<T>(index, relativeOffset);
 		}
 	}
 
@@ -83,7 +85,7 @@ namespace Interface {
 	// First, the scalar types
 
 #	define X(Type, _) \
-	template void VertexArray::AddAttribute<Type>(const GLuint index, const GLsizei stride, const void* pointer);
+	template void VertexArray::AddAttribute<Type>(const GLuint index, const GLuint relativeOffset);
 	SCALAR_TYPES_ELEMS
 #	undef X
 
@@ -94,7 +96,7 @@ namespace Interface {
 	P(4, Type)
 
 #	define P(dims, Type) \
-	template void VertexArray::AddAttribute<glm::vec<dims, Type>>(const GLuint index, const GLsizei stride, const void* pointer);
+	template void VertexArray::AddAttribute<glm::vec<dims, Type>>(const GLuint index, const GLuint relativeOffset);
 	SCALAR_TYPES_ELEMS
 #	undef P
 #	undef X

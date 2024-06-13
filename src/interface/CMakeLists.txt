@@ -16,7 +16,7 @@ set(sourceFiles
 
 add_library(interface ${sourceFiles})
 
-find_package(glfw3 3.4 REQUIRED)
+find_package(glfw3 REQUIRED)
 find_package(glad REQUIRED)
 find_package(glm REQUIRED)
 find_package(stb REQUIRED)

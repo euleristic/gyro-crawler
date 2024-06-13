@@ -24,7 +24,7 @@ Stars::Stars(Input& input) :
 	apparentPixelsPerGameUnitUniform(program, "apparentPixelsPerGameUnitUniform"),
 	apparentPixelWidthUniform(program, "apparentPixelWidthUniform"),
 	vertexBuffer(VertexBuffer(std::span(vertices))),
-	vertexArray(VertexArray::WithLayout<glm::vec2>(vertexBuffer)) {
+	vertexArray(VertexArray::WithLayout<glm::vec2>()) {
 
 	static_cast<void>(transformUniform.Set(transform));
 }
@@ -64,5 +64,5 @@ void Stars::Draw(const glm::mat3 apparentPixelToClipSpace, const float apparentP
 	boundToken = apparentPixelToClipSpaceUniform.Set(apparentPixelToClipSpace, std::move(boundToken));
 	boundToken = apparentPixelsPerGameUnitUniform.Set(apparentPixelsPerGameUnit, std::move(boundToken));
 	boundToken = apparentPixelWidthUniform.Set(apparentPixelWidth, std::move(boundToken));
-	static_cast<void>(program.Run<Program::DrawingMode::POINTS>(vertexArray, 0, vertices.size(), std::move(boundToken)));
+	static_cast<void>(program.Run<Program::DrawingMode::POINTS>(vertexArray, vertexBuffer, std::move(boundToken)));
 }

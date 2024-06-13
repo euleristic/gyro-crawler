@@ -13,6 +13,10 @@ class GameRecipe(ConanFile):
 		self.requires("glm/cci.20230113")
 		self.requires("stb/cci.20230920")
 
+	def configure(self):
+		self.options["glad"].gl_profile = "core"
+		self.options["glad"].gl_version = "4.3"
+
 	def layout(self):
 		cmake_layout(self)
 

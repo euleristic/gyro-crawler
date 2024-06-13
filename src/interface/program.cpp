@@ -57,8 +57,8 @@ namespace Interface {
 	}
 
 	template <Program::DrawingMode mode>
-	Program::BoundToken Program::Run(VertexArray& vertexArray, const GLint first, const GLsizei count) {
-		return Run<mode>(vertexArray, first, count, Bind());
+	Program::BoundToken Program::Run(VertexArray& vertexArray, VertexBuffer& vertexBuffer) {
+		return Run<mode>(vertexArray, vertexBuffer, Bind());
 	}
 
 #	define DRAWING_MODES \
@@ -86,15 +86,16 @@ namespace Interface {
 	}
 
 	template <Program::DrawingMode mode>
-	Program::BoundToken Program::Run(VertexArray& vertexArray, const GLint first, const GLsizei count, BoundToken&& programBoundToken) {
-		auto boundToken = vertexArray.Bind();
-		glDrawArrays(Symbol<mode>(), first, count);
+	Program::BoundToken Program::Run(VertexArray& vertexArray, VertexBuffer& vertexBuffer, BoundToken&& programBoundToken) {
+		auto arrayBound  = vertexArray.Bind();
+		auto bufferBound = vertexBuffer.Bind();
+		glDrawArrays(Symbol<mode>(), 0, vertexBuffer.Size());
 		return programBoundToken;
 	}
 
 #	define X(name) \
-	template Program::BoundToken Program::Run<Program::DrawingMode::name>(VertexArray&, const GLint, const GLsizei); \
-	template Program::BoundToken Program::Run<Program::DrawingMode::name>(VertexArray&, const GLint, const GLsizei, BoundToken&&);
+	template Program::BoundToken Program::Run<Program::DrawingMode::name>(VertexArray&, VertexBuffer&); \
+	template Program::BoundToken Program::Run<Program::DrawingMode::name>(VertexArray&, VertexBuffer&, BoundToken&&);
 	DRAWING_MODES
 #	undef X
 }

@@ -37,9 +37,9 @@ namespace Interface {
 		[[nodiscard]] uint32_t Key() const;
 		[[nodiscard]] BoundToken Bind();
 		template <DrawingMode mode>
-		[[nodiscard]] BoundToken Run(VertexArray& vertexArray, const int32_t first, const int32_t count);
+		[[nodiscard]] BoundToken Run(VertexArray& vertexArray, VertexBuffer& vertexBuffer);
 		template <DrawingMode mode>
-		[[nodiscard]] BoundToken Run(VertexArray& vertexArray, const int32_t first, const int32_t count, BoundToken&& boundToken);
+		[[nodiscard]] BoundToken Run(VertexArray& vertexArray, VertexBuffer& vertexBuffer, BoundToken&& boundToken);
 	private:
 		HandleType handle;
 	};
