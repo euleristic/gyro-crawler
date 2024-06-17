@@ -1,18 +1,13 @@
 #include "stars.hpp"
 
 #include "shader-source.hpp"
-#include <array>
+#include <random>
+#include <vector>
+#include <span>
 
 using namespace Interface;
 
-constexpr auto vertices = std::to_array<const glm::vec2>({
-	{  1.0f, -1.0f },
-	{  1.0f,  1.0f },
-	{ -1.0f, -1.0f },
-	{ -1.0f,  1.0f }
-});
-
-Stars::Stars(Input& input) : 
+Stars::Stars(Input& input, const float chebyshevRadius, const size_t count) : 
 	input(input),
 	program(Program(
 		VertexShader(ShaderSource::STARS_VERTEX), 
@@ -23,9 +18,18 @@ Stars::Stars(Input& input) :
 	apparentPixelToClipSpaceUniform(program, "apparentPixelToClipSpaceUniform"),
 	apparentPixelsPerGameUnitUniform(program, "apparentPixelsPerGameUnitUniform"),
 	apparentPixelWidthUniform(program, "apparentPixelWidthUniform"),
-	vertexBuffer(VertexBuffer(std::span(vertices))),
-	vertexArray(VertexArray::WithLayout<glm::vec2>()) {
-
+	vertexArray(VertexArray::WithLayout<glm::vec2>()),
+	vertexBuffer([chebyshevRadius, count]() {
+		std::random_device device;
+		std::default_random_engine engine(device());
+		std::uniform_real_distribution<float> dist(-chebyshevRadius, chebyshevRadius);
+		std::vector<glm::vec2> vertices(count);
+		for (size_t i{}; i < count; ++i) {
+			vertices[i].x = dist(engine);
+			vertices[i].y = dist(engine); 
+		}
+		return VertexBuffer(std::span(vertices));
+	}()) {
 	static_cast<void>(transformUniform.Set(transform));
 }
 

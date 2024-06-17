@@ -36,7 +36,7 @@ int main() {
 		Interface::Renderer renderer;
 		
 		Interface::Input input(window);
-		Stars stars(input);
+		Stars stars(input, 1.0f, 10);
 
 		auto lastFrame = std::chrono::steady_clock::now();
 		std::chrono::duration<float> deltaTime{};
