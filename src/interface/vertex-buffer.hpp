@@ -18,7 +18,7 @@ namespace Interface {
 		};
 		VertexBuffer() = default;
 		template <typename Vertex, size_t size>
-		VertexBuffer(const std::span<Vertex, size> buffer) : size(size), elemSize(sizeof(Vertex)) {
+		VertexBuffer(const std::span<Vertex, size> buffer) : size(buffer.size()), elemSize(sizeof(Vertex)) {
 			Init(buffer.size() * sizeof(Vertex), buffer.data());
 		};
 		uint32_t Key() const;
