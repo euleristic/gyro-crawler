@@ -40,7 +40,7 @@ namespace Interface {
 		KeyState lastKeyState;
 		KeyState currentKeyState;
 
-		using MouseButtonState = std::bitset<static_cast<size_t>(Key::COUNT)>;
+		using MouseButtonState = std::bitset<static_cast<size_t>(MouseButton::COUNT)>;
 		MouseButtonState NextMouseButtonState() const;
 		MouseButtonState lastMouseButtonState;
 		MouseButtonState currentMouseButtonState;

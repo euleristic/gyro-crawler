@@ -20,7 +20,7 @@ namespace Interface {
 	}
 
 	bool Input::Down(const MouseButton mouseButton) const {
-		return !lastKeyState[static_cast<size_t>(mouseButton)] && currentKeyState[static_cast<size_t>(mouseButton)];
+		return !lastMouseButtonState[static_cast<size_t>(mouseButton)] && currentMouseButtonState[static_cast<size_t>(mouseButton)];
 	}
 
 	bool Input::Held(const Key key) const {
@@ -28,7 +28,7 @@ namespace Interface {
 	}
 
 	bool Input::Held(const MouseButton mouseButton) const {
-		return currentKeyState[static_cast<size_t>(mouseButton)];
+		return currentMouseButtonState[static_cast<size_t>(mouseButton)];
 	}
 
 	bool Input::Up(const Key key) const {
@@ -36,7 +36,7 @@ namespace Interface {
 	}
 
 	bool Input::Up(const MouseButton mouseButton) const {
-		return lastKeyState[static_cast<size_t>(mouseButton)] && !currentKeyState[static_cast<size_t>(mouseButton)];
+		return lastMouseButtonState[static_cast<size_t>(mouseButton)] && !currentMouseButtonState[static_cast<size_t>(mouseButton)];
 	}
 
 	Input::MouseButtonState Input::NextMouseButtonState() const {
